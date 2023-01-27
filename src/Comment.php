@@ -11,6 +11,11 @@ class Comment
         private string $text
     ) {}
 
+    public function __toString(): string
+    {
+        return "Comment: Author with ID $this->authorId left a comment for the post with ID $this->postId:\n'$this->text'";
+    }
+
     /**
      * @return int
      */
