@@ -7,11 +7,11 @@ use Gabormakeev\GbBlogApi\User;
 
 require 'vendor/autoload.php';
 
-$faker = Factory::create();
-
 if (!isset($argv[1]) || !in_array($argv[1], ['user', 'post', 'comment'])) {
     die('Please enter a valid argument for the cli.php script: user, post or comment' . PHP_EOL);
 }
+
+$faker = Factory::create();
 
 $user = new User(
     $faker->randomDigitNotNull(),
