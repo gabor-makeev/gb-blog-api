@@ -10,6 +10,11 @@ class User
         private string $lastName
     ) {}
 
+    public function __toString(): string
+    {
+        return "User: $this->firstName $this->lastName";
+    }
+
     /**
      * @return int
      */
