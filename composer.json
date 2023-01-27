@@ -10,5 +10,7 @@
             "name": "Gabor Makejev"
         }
     ],
-    "require": {}
+    "require": {
+        "fakerphp/faker": "^1.21"
+    }
 }
