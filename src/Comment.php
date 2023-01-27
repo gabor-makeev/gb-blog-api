@@ -1,11 +1,13 @@
 <?php
 
-class Post
+namespace Gabormakeev\GbBlogApi;
+
+class Comment
 {
     public function __construct(
         private int $id,
         private int $authorId,
-        private string $title,
+        private int $postId,
         private string $text
     ) {}
 
@@ -42,19 +44,19 @@ class Post
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getTitle(): string
+    public function getPostId(): int
     {
-        return $this->title;
+        return $this->postId;
     }
 
     /**
-     * @param string $title
+     * @param int $postId
      */
-    public function setTitle(string $title): void
+    public function setPostId(int $postId): void
     {
-        $this->title = $title;
+        $this->postId = $postId;
     }
 
     /**

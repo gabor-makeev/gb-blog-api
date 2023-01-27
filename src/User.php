@@ -1,5 +1,7 @@
 <?php
 
+namespace Gabormakeev\GbBlogApi;
+
 class User
 {
     public function __construct(

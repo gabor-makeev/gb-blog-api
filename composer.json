@@ -1,0 +1,14 @@
+{
+    "name": "gabormakeev/gb-blog-api",
+    "autoload": {
+        "psr-4": {
+            "Gabormakeev\\GbBlogApi\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Gabor Makejev"
+        }
+    ],
+    "require": {}
+}
