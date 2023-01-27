@@ -11,6 +11,11 @@ class Post
         private string $text
     ) {}
 
+    public function __toString(): string
+    {
+        return "Post: Author with ID $this->authorId created a post with title '$this->title':\n'$this->text'";
+    }
+
     /**
      * @return int
      */
