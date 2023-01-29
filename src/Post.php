@@ -5,47 +5,47 @@ namespace Gabormakeev\GbBlogApi;
 class Post
 {
     public function __construct(
-        private int $id,
-        private int $authorId,
+        private UUID $uuid,
+        private UUID $authorUuid,
         private string $title,
         private string $text
     ) {}
 
     public function __toString(): string
     {
-        return "Post: Author with ID $this->authorId created a post with title '$this->title':\n'$this->text'";
+        return "Post: Author with UUID $this->authorUuid created a post with title '$this->title':\n'$this->text'";
     }
 
     /**
-     * @return int
+     * @return UUID
      */
-    public function getId(): int
+    public function getUuid(): UUID
     {
-        return $this->id;
+        return $this->uuid;
     }
 
     /**
-     * @param int $id
+     * @param UUID $uuid
      */
-    public function setId(int $id): void
+    public function setUuid(UUID $uuid): void
     {
-        $this->id = $id;
+        $this->uuid = $uuid;
     }
 
     /**
-     * @return int
+     * @return UUID
      */
-    public function getAuthorId(): int
+    public function getAuthorUuid(): UUID
     {
-        return $this->authorId;
+        return $this->authorUuid;
     }
 
     /**
-     * @param int $authorId
+     * @param UUID $authorUuid
      */
-    public function setAuthorId(int $authorId): void
+    public function setAuthorUuid(UUID $authorUuid): void
     {
-        $this->authorId = $authorId;
+        $this->authorUuid = $authorUuid;
     }
 
     /**
