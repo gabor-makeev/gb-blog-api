@@ -5,7 +5,8 @@ namespace Gabormakeev\GbBlogApi;
 class User
 {
     public function __construct(
-        private int $id,
+        private UUID $uuid,
+        private string $username,
         private string $firstName,
         private string $lastName
     ) {}
@@ -16,19 +17,35 @@ class User
     }
 
     /**
-     * @return int
+     * @return UUID
      */
-    public function getId(): int
+    public function getUuid(): UUID
     {
-        return $this->id;
+        return $this->uuid;
     }
 
     /**
-     * @param int $id
+     * @param UUID $uuid
      */
-    public function setId(int $id): void
+    public function setUuid(UUID $uuid): void
     {
-        $this->id = $id;
+        $this->$uuid = $uuid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param string $username
+     */
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
     }
 
     /**
