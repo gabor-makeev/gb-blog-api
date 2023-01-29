@@ -29,7 +29,7 @@ class User
      */
     public function setUuid(UUID $uuid): void
     {
-        $this->$uuid = $uuid;
+        $this->uuid = $uuid;
     }
 
     /**
