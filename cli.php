@@ -1,53 +1,64 @@
 <?php
 
 use Faker\Factory;
+use Gabormakeev\GbBlogApi\Commands\Arguments;
+use Gabormakeev\GbBlogApi\Commands\CreateUserCommand;
 use Gabormakeev\GbBlogApi\Comment;
+use Gabormakeev\GbBlogApi\Exceptions\AppException;
 use Gabormakeev\GbBlogApi\Post;
-use Gabormakeev\GbBlogApi\User;
+use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\SqliteCommentsRepository;
+use Gabormakeev\GbBlogApi\Repositories\PostsRepository\SqlitePostsRepository;
+use Gabormakeev\GbBlogApi\Repositories\UsersRepository\SqliteUsersRepository;
+use Gabormakeev\GbBlogApi\UUID;
 
 require 'vendor/autoload.php';
 
-if (!isset($argv[1]) || !in_array($argv[1], ['user', 'post', 'comment'])) {
-    die('Please enter a valid argument for the cli.php script: user, post or comment' . PHP_EOL);
+$connection = new PDO('sqlite:' . __DIR__ . '/blog.sqlite');
+
+$usersRepository = new SqliteUsersRepository($connection);
+$postsRepository = new SqlitePostsRepository($connection);
+$commentsRepository = new SqliteCommentsRepository($connection);
+
+$command = new CreateUserCommand($usersRepository);
+
+try {
+    $command->handle(Arguments::fromArgv($argv));
+} catch (AppException $e) {
+    echo "{$e->getMessage()}\n";
 }
 
 $faker = Factory::create();
 
-$user = new User(
-    $faker->randomDigitNotNull(),
-    $faker->firstName(),
-    $faker->lastName()
+// SqlitePostsRepository testing
+
+$fakePost = new Post(
+    UUID::random(),
+    new UUID('ad6f62fb-9c77-49f2-8411-1719e6964d52'), // uuid of user with username "test" in the database
+    $faker->sentence(),
+    $faker->text()
 );
 
-switch ($argv[1]) {
-    case 'user':
-        echo $user . PHP_EOL;
-        break;
-    case 'post':
-        $post = new Post(
-            $faker->randomDigitNotNull(),
-            $user->getId(),
-            $faker->sentence(),
-            $faker->realText()
-        );
+$postsRepository->save($fakePost);
 
-        echo $post . PHP_EOL;
-        break;
-    case 'comment':
-        $post = new Post(
-            $faker->randomDigitNotNull(),
-            $user->getId(),
-            $faker->sentence(),
-            $faker->realText()
-        );
+$savedPost = $postsRepository->get($fakePost->getUuid());
+$savedPostAuthor = $usersRepository->get($savedPost->getAuthorUuid());
 
-        $comment = new Comment(
-            $faker->randomDigitNotNull(),
-            $user->getId(),
-            $post->getId(),
-            $faker->realText()
-        );
+echo "{$savedPostAuthor->getUsername()} wrote a post with the title '{$savedPost->getTitle()}':\n{$savedPost->getText()}\n";
 
-        echo $comment . PHP_EOL;
-        break;
-}
+// SqliteCommentsRepository testing
+
+$fakeComment = new Comment(
+    UUID::random(),
+    new UUID('24abd8c6-ba95-4b87-91b3-ba55c24a58a5'), // uuid of user with username "test_2" in the database
+    $fakePost->getUuid(),
+    $faker->text()
+);
+
+$commentsRepository->save($fakeComment);
+
+$savedComment = $commentsRepository->get($fakeComment->getUuid());
+$savedCommentAuthor = $usersRepository->get($savedComment->getAuthorUuid());
+$savedCommentPost = $postsRepository->get($savedComment->getPostUuid());
+$savedCommentPostAuthor = $usersRepository->get($savedCommentPost->getAuthorUuid());
+
+echo "{$savedCommentAuthor->getUsername()} wrote a comment to a post with title '{$savedCommentPost->getTitle()}' (Author: {$savedCommentPostAuthor->getUsername()}):\n{$savedComment->getText()}\n";

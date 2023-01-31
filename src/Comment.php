@@ -5,63 +5,63 @@ namespace Gabormakeev\GbBlogApi;
 class Comment
 {
     public function __construct(
-        private int $id,
-        private int $authorId,
-        private int $postId,
+        private UUID $uuid,
+        private UUID $authorUuid,
+        private UUID $postUuid,
         private string $text
     ) {}
 
     public function __toString(): string
     {
-        return "Comment: Author with ID $this->authorId left a comment for the post with ID $this->postId:\n'$this->text'";
+        return "Comment: Author with UUID $this->authorUuid left a comment for the post with UUID $this->postUuid:\n'$this->text'";
     }
 
     /**
-     * @return int
+     * @return UUID
      */
-    public function getId(): int
+    public function getUuid(): UUID
     {
-        return $this->id;
+        return $this->uuid;
     }
 
     /**
-     * @param int $id
+     * @param UUID $uuid
      */
-    public function setId(int $id): void
+    public function setUuid(UUID $uuid): void
     {
-        $this->id = $id;
+        $this->uuid = $uuid;
     }
 
     /**
-     * @return int
+     * @return UUID
      */
-    public function getAuthorId(): int
+    public function getAuthorUuid(): UUID
     {
-        return $this->authorId;
+        return $this->authorUuid;
     }
 
     /**
-     * @param int $authorId
+     * @param UUID $authorUuid
      */
-    public function setAuthorId(int $authorId): void
+    public function setAuthorUuid(UUID $authorUuid): void
     {
-        $this->authorId = $authorId;
+        $this->authorUuid = $authorUuid;
     }
 
     /**
-     * @return int
+     * @return UUID
      */
-    public function getPostId(): int
+    public function getPostUuid(): UUID
     {
-        return $this->postId;
+        return $this->postUuid;
     }
 
     /**
-     * @param int $postId
+     * @param UUID $postUuid
      */
-    public function setPostId(int $postId): void
+    public function setPostUuid(UUID $postUuid): void
     {
-        $this->postId = $postId;
+        $this->postUuid = $postUuid;
     }
 
     /**
