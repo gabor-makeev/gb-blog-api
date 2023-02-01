@@ -18,5 +18,8 @@
         "fakerphp/faker": "^1.21",
         "phpunit/phpunit": "^9.5",
         "roave/security-advisories": "dev-latest"
+    },
+    "scripts": {
+        "test": "phpunit tests --testdox --colors"
     }
 }
