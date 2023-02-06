@@ -10,7 +10,11 @@ use Gabormakeev\GbBlogApi\Repositories\UsersRepository\SqliteUsersRepository;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-$request = new Request($_GET, $_SERVER);
+$request = new Request(
+    $_GET,
+    $_SERVER,
+    file_get_contents('php://input')
+);
 
 try {
     $path = $request->path();

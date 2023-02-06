@@ -20,7 +20,7 @@ class FindByUsernameActionTest extends TestCase
      */
     public function testItReturnsErrorResponseIfNoUsernameProvided(): void
     {
-        $request = new Request([], []);
+        $request = new Request([], [], '');
 
         $usersRepository = $this->usersRepository([]);
 
@@ -41,7 +41,7 @@ class FindByUsernameActionTest extends TestCase
      */
     public function testItReturnsErrorResponseIfUserNotFound(): void
     {
-        $request = new Request(['username' => 'Ivan'], []);
+        $request = new Request(['username' => 'Ivan'], [], '');
 
         $usersRepository = $this->usersRepository([]);
 
@@ -62,7 +62,7 @@ class FindByUsernameActionTest extends TestCase
      */
     public function testItReturnsSuccessfulResponse(): void
     {
-        $request = new Request(['username' => 'ivan'], []);
+        $request = new Request(['username' => 'ivan'], [], '');
 
         $usersRepository = $this->usersRepository([
             new User(
