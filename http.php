@@ -1,6 +1,7 @@
 <?php
 
 use Gabormakeev\GbBlogApi\Http\Request;
+use Gabormakeev\GbBlogApi\Http\SuccessfulResponse;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -10,4 +11,8 @@ $parameter = $request->query('some_parameter');
 $header = $request->header('Some-Header');
 $path = $request->path();
 
-echo 'Hello from PHP';
+$response = new SuccessfulResponse([
+    'message' => 'Hello from PHP'
+]);
+
+$response->send();
