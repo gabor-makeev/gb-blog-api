@@ -1,11 +1,13 @@
 <?php
 
 use Gabormakeev\GbBlogApi\Exceptions\AppException;
+use Gabormakeev\GbBlogApi\Http\Actions\Comments\CreateComment;
 use Gabormakeev\GbBlogApi\Http\Actions\Posts\CreatePost;
 use Gabormakeev\GbBlogApi\Http\Actions\Users\FindByUsername;
 use Gabormakeev\GbBlogApi\Http\ErrorResponse;
 use Gabormakeev\GbBlogApi\Http\Request;
 use Gabormakeev\GbBlogApi\Exceptions\HttpException;
+use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\SqliteCommentsRepository;
 use Gabormakeev\GbBlogApi\Repositories\PostsRepository\SqlitePostsRepository;
 use Gabormakeev\GbBlogApi\Repositories\UsersRepository\SqliteUsersRepository;
 
@@ -47,6 +49,17 @@ $routes = [
     ],
     'POST' => [
         '/posts/create' => new CreatePost(
+            new SqlitePostsRepository(
+                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
+            ),
+            new SqliteUsersRepository(
+                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
+            )
+        ),
+        '/posts/comment' => new CreateComment(
+            new SqliteCommentsRepository(
+                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
+            ),
             new SqlitePostsRepository(
                 new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
             ),
