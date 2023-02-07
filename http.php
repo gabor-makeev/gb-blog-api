@@ -3,6 +3,7 @@
 use Gabormakeev\GbBlogApi\Exceptions\AppException;
 use Gabormakeev\GbBlogApi\Http\Actions\Comments\CreateComment;
 use Gabormakeev\GbBlogApi\Http\Actions\Posts\CreatePost;
+use Gabormakeev\GbBlogApi\Http\Actions\Posts\DeletePost;
 use Gabormakeev\GbBlogApi\Http\Actions\Users\FindByUsername;
 use Gabormakeev\GbBlogApi\Http\ErrorResponse;
 use Gabormakeev\GbBlogApi\Http\Request;
@@ -64,6 +65,13 @@ $routes = [
                 new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
             ),
             new SqliteUsersRepository(
+                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
+            )
+        )
+    ],
+    'DELETE' => [
+        '/posts' => new DeletePost(
+            new SqlitePostsRepository(
                 new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
             )
         )
