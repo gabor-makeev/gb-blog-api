@@ -6,20 +6,18 @@ use Gabormakeev\GbBlogApi\Commands\CreateUserCommand;
 use Gabormakeev\GbBlogApi\Comment;
 use Gabormakeev\GbBlogApi\Exceptions\AppException;
 use Gabormakeev\GbBlogApi\Post;
-use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\SqliteCommentsRepository;
-use Gabormakeev\GbBlogApi\Repositories\PostsRepository\SqlitePostsRepository;
-use Gabormakeev\GbBlogApi\Repositories\UsersRepository\SqliteUsersRepository;
+use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\CommentsRepositoryInterface;
+use Gabormakeev\GbBlogApi\Repositories\PostsRepository\PostsRepositoryInterface;
+use Gabormakeev\GbBlogApi\Repositories\UsersRepository\UsersRepositoryInterface;
 use Gabormakeev\GbBlogApi\UUID;
 
-require 'vendor/autoload.php';
+$container = require __DIR__ . '/bootstrap.php';
 
-$connection = new PDO('sqlite:' . __DIR__ . '/blog.sqlite');
+$usersRepository = $container->get(UsersRepositoryInterface::class);
+$postsRepository = $container->get(PostsRepositoryInterface::class);
+$commentsRepository = $container->get(CommentsRepositoryInterface::class);
 
-$usersRepository = new SqliteUsersRepository($connection);
-$postsRepository = new SqlitePostsRepository($connection);
-$commentsRepository = new SqliteCommentsRepository($connection);
-
-$command = new CreateUserCommand($usersRepository);
+$command = $container->get(CreateUserCommand::class);
 
 try {
     $command->handle(Arguments::fromArgv($argv));

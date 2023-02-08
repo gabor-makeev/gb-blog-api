@@ -8,11 +8,8 @@ use Gabormakeev\GbBlogApi\Http\Actions\Users\FindByUsername;
 use Gabormakeev\GbBlogApi\Http\ErrorResponse;
 use Gabormakeev\GbBlogApi\Http\Request;
 use Gabormakeev\GbBlogApi\Exceptions\HttpException;
-use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\SqliteCommentsRepository;
-use Gabormakeev\GbBlogApi\Repositories\PostsRepository\SqlitePostsRepository;
-use Gabormakeev\GbBlogApi\Repositories\UsersRepository\SqliteUsersRepository;
 
-require_once __DIR__ . '/vendor/autoload.php';
+$container = require __DIR__ . '/bootstrap.php';
 
 $request = new Request(
     $_GET,
@@ -36,11 +33,7 @@ try {
 
 $routes = [
     'GET' => [
-        '/users/show' => new FindByUsername(
-            new SqliteUsersRepository(
-                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
-            )
-        ),
+        '/users/show' => FindByUsername::class,
     // TODO:
     //    '/posts/show' => new FindByUuid(
     //        new SqlitePostsRepository(
@@ -49,32 +42,11 @@ $routes = [
     //    )
     ],
     'POST' => [
-        '/posts/create' => new CreatePost(
-            new SqlitePostsRepository(
-                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
-            ),
-            new SqliteUsersRepository(
-                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
-            )
-        ),
-        '/posts/comment' => new CreateComment(
-            new SqliteCommentsRepository(
-                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
-            ),
-            new SqlitePostsRepository(
-                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
-            ),
-            new SqliteUsersRepository(
-                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
-            )
-        )
+        '/posts/create' => CreatePost::class,
+        '/posts/comment' => CreateComment::class
     ],
     'DELETE' => [
-        '/posts' => new DeletePost(
-            new SqlitePostsRepository(
-                new PDO('sqlite:' . __DIR__ . '/blog.sqlite')
-            )
-        )
+        '/posts' => DeletePost::class
     ]
 ];
 
@@ -88,7 +60,9 @@ if (!array_key_exists($path, $routes[$method])) {
     return;
 }
 
-$action = $routes[$method][$path];
+$actionClassName = $routes[$method][$path];
+
+$action = $container->get($actionClassName);
 
 try {
     $response = $action->handle($request);
