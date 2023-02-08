@@ -5,6 +5,11 @@
             "Gabormakeev\\GbBlogApi\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Gabormakeev\\GbBlogApi\\UnitTests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Gabor Makejev"
