@@ -3,11 +3,23 @@
 namespace Gabormakeev\GbBlogApi\Container;
 
 use Gabormakeev\GbBlogApi\Exceptions\NotFoundException;
+use Psr\Container\ContainerInterface;
 use ReflectionClass;
 
-class DIContainer
+class DIContainer implements ContainerInterface
 {
     private array $resolvers = [];
+
+    public function has(string $id): bool
+    {
+        try {
+            $this->get($id);
+        } catch (NotFoundException $e) {
+            return false;
+        }
+
+        return true;
+    }
 
     public function bind(string $type, $resolver): void
     {

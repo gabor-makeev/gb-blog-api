@@ -17,7 +17,8 @@
     ],
     "require": {
         "symfony/polyfill-uuid": "^1.27",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "psr/container": "^2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.21",
