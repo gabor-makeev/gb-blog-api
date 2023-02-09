@@ -49,4 +49,28 @@ class SqlitePostLikesRepository implements PostLikesRepositoryInterface
 
         return $postLikes;
     }
+
+    public function findByPostUuidAndUserUuid(UUID $postUuid, UUID $userUuid): ?PostLike
+    {
+        $statement = $this->connection->prepare(
+            'SELECT * FROM post_likes WHERE post_uuid = :post_uuid AND user_uuid = :user_uuid'
+        );
+
+        $statement->execute([
+            ':post_uuid' => (string)$postUuid,
+            ':user_uuid' => (string)$userUuid
+        ]);
+
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if ($result === false) {
+            return null;
+        }
+
+        return new PostLike(
+            new UUID($result['uuid']),
+            new UUID($result['post_uuid']),
+            new UUID($result['user_uuid'])
+        );
+    }
 }

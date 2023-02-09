@@ -2,6 +2,7 @@
 
 use Gabormakeev\GbBlogApi\Exceptions\AppException;
 use Gabormakeev\GbBlogApi\Http\Actions\Comments\CreateComment;
+use Gabormakeev\GbBlogApi\Http\Actions\PostLikes\CreatePostLike;
 use Gabormakeev\GbBlogApi\Http\Actions\Posts\CreatePost;
 use Gabormakeev\GbBlogApi\Http\Actions\Posts\DeletePost;
 use Gabormakeev\GbBlogApi\Http\Actions\Users\FindByUsername;
@@ -43,7 +44,8 @@ $routes = [
     ],
     'POST' => [
         '/posts/create' => CreatePost::class,
-        '/posts/comment' => CreateComment::class
+        '/posts/comment' => CreateComment::class,
+        '/postLikes/create' => CreatePostLike::class
     ],
     'DELETE' => [
         '/posts' => DeletePost::class
