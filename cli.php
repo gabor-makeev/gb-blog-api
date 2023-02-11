@@ -10,6 +10,7 @@ use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\CommentsRepositoryInte
 use Gabormakeev\GbBlogApi\Repositories\PostsRepository\PostsRepositoryInterface;
 use Gabormakeev\GbBlogApi\Repositories\UsersRepository\UsersRepositoryInterface;
 use Gabormakeev\GbBlogApi\UUID;
+use Psr\Log\LoggerInterface;
 
 $container = require __DIR__ . '/bootstrap.php';
 
@@ -19,10 +20,12 @@ $commentsRepository = $container->get(CommentsRepositoryInterface::class);
 
 $command = $container->get(CreateUserCommand::class);
 
+$logger = $container->get(LoggerInterface::class);
+
 try {
     $command->handle(Arguments::fromArgv($argv));
 } catch (AppException $e) {
-    echo "{$e->getMessage()}\n";
+    $logger->error($e->getMessage(), ['exception' => $e]);
 }
 
 $faker = Factory::create();
