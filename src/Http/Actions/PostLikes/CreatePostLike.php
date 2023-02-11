@@ -12,17 +12,17 @@ use Gabormakeev\GbBlogApi\Http\Request;
 use Gabormakeev\GbBlogApi\Http\Response;
 use Gabormakeev\GbBlogApi\Http\SuccessfulResponse;
 use Gabormakeev\GbBlogApi\PostLike;
-use Gabormakeev\GbBlogApi\Repositories\PostLikesRepository\SqlitePostLikesRepository;
-use Gabormakeev\GbBlogApi\Repositories\PostsRepository\SqlitePostsRepository;
-use Gabormakeev\GbBlogApi\Repositories\UsersRepository\SqliteUsersRepository;
+use Gabormakeev\GbBlogApi\Repositories\PostLikesRepository\PostLikesRepositoryInterface;
+use Gabormakeev\GbBlogApi\Repositories\PostsRepository\PostsRepositoryInterface;
+use Gabormakeev\GbBlogApi\Repositories\UsersRepository\UsersRepositoryInterface;
 use Gabormakeev\GbBlogApi\UUID;
 
 class CreatePostLike implements ActionInterface
 {
     public function __construct(
-        private SqlitePostLikesRepository $postLikesRepository,
-        private SqlitePostsRepository $postsRepository,
-        private SqliteUsersRepository $usersRepository
+        private PostLikesRepositoryInterface $postLikesRepository,
+        private PostsRepositoryInterface $postsRepository,
+        private UsersRepositoryInterface $usersRepository
     ) {}
 
     public function handle(Request $request): Response

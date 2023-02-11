@@ -3,6 +3,8 @@
 use Gabormakeev\GbBlogApi\Container\DIContainer;
 use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\CommentsRepositoryInterface;
 use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\SqliteCommentsRepository;
+use Gabormakeev\GbBlogApi\Repositories\PostLikesRepository\PostLikesRepositoryInterface;
+use Gabormakeev\GbBlogApi\Repositories\PostLikesRepository\SqlitePostLikesRepository;
 use Gabormakeev\GbBlogApi\Repositories\PostsRepository\PostsRepositoryInterface;
 use Gabormakeev\GbBlogApi\Repositories\PostsRepository\SqlitePostsRepository;
 use Gabormakeev\GbBlogApi\Repositories\UsersRepository\SqliteUsersRepository;
@@ -30,6 +32,11 @@ $container->bind(
 $container->bind(
     CommentsRepositoryInterface::class,
     SqliteCommentsRepository::class
+);
+
+$container->bind(
+    PostLikesRepositoryInterface::class,
+    SqlitePostLikesRepository::class
 );
 
 return $container;
