@@ -9,6 +9,7 @@ use Gabormakeev\GbBlogApi\Exceptions\CommandException;
 use Gabormakeev\GbBlogApi\Exceptions\UserNotFoundException;
 use Gabormakeev\GbBlogApi\Repositories\UsersRepository\DummyUsersRepository;
 use Gabormakeev\GbBlogApi\Repositories\UsersRepository\UsersRepositoryInterface;
+use Gabormakeev\GbBlogApi\UnitTests\DummyLogger;
 use Gabormakeev\GbBlogApi\User;
 use Gabormakeev\GbBlogApi\UUID;
 use PHPUnit\Framework\TestCase;
@@ -18,7 +19,8 @@ class CreateUserCommandTest extends TestCase
     public function testItThrowsAnExceptionWhenUserAlreadyExists(): void
     {
         $command = new CreateUserCommand(
-            new DummyUsersRepository()
+            new DummyUsersRepository(),
+            new DummyLogger()
         );
 
         $this->expectException(CommandException::class);
@@ -53,7 +55,7 @@ class CreateUserCommandTest extends TestCase
             }
         };
 
-        $command = new CreateUserCommand($usersRepository);
+        $command = new CreateUserCommand($usersRepository, new DummyLogger());
 
         $command->handle(new Arguments([
             'username' => 'Ivan',
@@ -66,7 +68,7 @@ class CreateUserCommandTest extends TestCase
 
     public function testItRequiresFirstName(): void
     {
-        $command = new CreateUserCommand($this->makeUsersRepository());
+        $command = new CreateUserCommand($this->makeUsersRepository(), new DummyLogger());
 
         $this->expectException(ArgumentsException::class);
         $this->expectExceptionMessage('No such argument: first_name');
@@ -76,7 +78,7 @@ class CreateUserCommandTest extends TestCase
 
     public function testItRequiresLastName(): void
     {
-        $command = new CreateUserCommand($this->makeUsersRepository());
+        $command = new CreateUserCommand($this->makeUsersRepository(), new DummyLogger());
 
         $this->expectException(ArgumentsException::class);
         $this->expectExceptionMessage('No such argument: last_name');
