@@ -5,6 +5,7 @@ namespace Gabormakeev\GbBlogApi\UnitTests\Repositories\CommentsRepository;
 use Gabormakeev\GbBlogApi\Comment;
 use Gabormakeev\GbBlogApi\Exceptions\CommentNotFoundException;
 use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\SqliteCommentsRepository;
+use Gabormakeev\GbBlogApi\UnitTests\DummyLogger;
 use Gabormakeev\GbBlogApi\UUID;
 use PDO;
 use PDOStatement;
@@ -36,7 +37,7 @@ class SqliteCommentsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
 
         $repository->save($comment);
     }
@@ -54,7 +55,7 @@ class SqliteCommentsRepositoryTest extends TestCase
         ]);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
 
         $comment = $repository->get(new UUID('7709b807-aaaa-bbbb-cccc-2f5f961b8767'));
 
@@ -69,10 +70,11 @@ class SqliteCommentsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
 
         $this->expectException(CommentNotFoundException::class);
         $this->expectExceptionMessage('Cannot find comment: 7709b807-aaaa-bbbb-cccc-2f5f961b8767');
+        $this->expectOutputString('Cannot find comment: 7709b807-aaaa-bbbb-cccc-2f5f961b8767');
 
         $repository->get(new UUID('7709b807-aaaa-bbbb-cccc-2f5f961b8767'));
     }

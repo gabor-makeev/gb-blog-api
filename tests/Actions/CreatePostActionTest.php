@@ -2,13 +2,15 @@
 
 namespace Gabormakeev\GbBlogApi\UnitTests\Actions;
 
+use Gabormakeev\GbBlogApi\Exceptions\HttpException;
+use Gabormakeev\GbBlogApi\Exceptions\InvalidArgumentException;
 use Gabormakeev\GbBlogApi\Exceptions\UserNotFoundException;
 use Gabormakeev\GbBlogApi\Http\Actions\Posts\CreatePost;
-use Gabormakeev\GbBlogApi\Http\ErrorResponse;
+use Gabormakeev\GbBlogApi\Http\Auth\IdentificationInterface;
 use Gabormakeev\GbBlogApi\Http\Request;
 use Gabormakeev\GbBlogApi\Http\SuccessfulResponse;
 use Gabormakeev\GbBlogApi\Repositories\PostsRepository\PostsRepositoryInterface;
-use Gabormakeev\GbBlogApi\Repositories\UsersRepository\UsersRepositoryInterface;
+use Gabormakeev\GbBlogApi\UnitTests\DummyLogger;
 use Gabormakeev\GbBlogApi\User;
 use Gabormakeev\GbBlogApi\UUID;
 use PHPUnit\Framework\TestCase;
@@ -21,7 +23,7 @@ class CreatePostActionTest extends TestCase
 
         $postsRepository = $this->createStub(PostsRepositoryInterface::class);
 
-        $usersRepository = $this->usersRepository([
+        $identification = $this->identification([
             new User(
                 new UUID('1235a110-ee17-4136-91ba-41f720a6d6b4'),
                 'test username',
@@ -30,7 +32,7 @@ class CreatePostActionTest extends TestCase
             )
         ]);
 
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost($postsRepository, $identification, new DummyLogger());
 
         $response = $action->handle($request);
 
@@ -41,93 +43,78 @@ class CreatePostActionTest extends TestCase
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testItReturnsErrorResponseIfMalformedUuid(): void
+    public function testItReturnsExceptionIfMalformedUuid(): void
     {
         $request = new Request([], [], '{"author_uuid": "1235a110-ee17-4136-91ba-41f720a6d6b","title": "some test post title","text": "some test post text"}');
 
         $postsRepository = $this->createStub(PostsRepositoryInterface::class);
 
-        $usersRepository = $this->usersRepository([]);
+        $identification = $this->identification([]);
 
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost($postsRepository, $identification, new DummyLogger());
 
-        $response = $action->handle($request);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Malformed UUID: 1235a110-ee17-4136-91ba-41f720a6d6b');
 
-        $this->assertInstanceOf(ErrorResponse::class, $response);
-
-        $this->expectOutputString('{"success":false,"reason":"Malformed UUID: 1235a110-ee17-4136-91ba-41f720a6d6b"}');
-
-        $response->send();
+        $action->handle($request);
     }
 
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testItReturnsErrorResponseIfUserNotFound(): void
+    public function testItReturnsExceptionIfUserNotFound(): void
     {
         $request = new Request([], [], '{"author_uuid": "1235a110-ee17-4136-91ba-41f720a6d6b4","title": "some test post title","text": "some test post text"}');
 
         $postsRepository = $this->createStub(PostsRepositoryInterface::class);
 
-        $usersRepository = $this->usersRepository([]);
+        $identification = $this->identification([]);
 
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost($postsRepository, $identification, new DummyLogger());
 
-        $response = $action->handle($request);
+        $this->expectException(UserNotFoundException::class);
+        $this->expectExceptionMessage('Cannot find user: 1235a110-ee17-4136-91ba-41f720a6d6b4');
 
-        $this->assertInstanceOf(ErrorResponse::class, $response);
-
-        $this->expectOutputString('{"success":false,"reason":"Cannot find user: 1235a110-ee17-4136-91ba-41f720a6d6b4"}');
-
-        $response->send();
+        $action->handle($request);
     }
 
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testItReturnsErrorResponseIfMissingParametersInBody(): void
+    public function testItReturnsExceptionIfMissingParametersInBody(): void
     {
         $request = new Request([], [], '{}');
 
         $postsRepository = $this->createStub(PostsRepositoryInterface::class);
 
-        $usersRepository = $this->usersRepository([]);
+        $identification = $this->identification([]);
 
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost($postsRepository, $identification, new DummyLogger());
 
-        $response = $action->handle($request);
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('No such field: author_uuid');
 
-        $this->assertInstanceOf(ErrorResponse::class, $response);
-
-        $this->expectOutputString('{"success":false,"reason":"No such field: author_uuid"}');
-
-        $response->send();
+        $action->handle($request);
     }
 
-    private function usersRepository(array $users): UsersRepositoryInterface
+    private function identification(array $users): IdentificationInterface
     {
-        return new class($users) implements UsersRepositoryInterface {
+        return new class($users) implements IdentificationInterface {
             public function __construct(
                 private array $users
             ) {}
 
-            public function save(User $user): void {}
-
-            public function get(UUID $uuid): User
+            public function user(Request $request): User
             {
+                $authorUuid = new UUID($request->jsonBodyField('author_uuid'));
                 foreach ($this->users as $user) {
-                    if ($user instanceof User && (string)$user->getUuid() === (string)$uuid) {
+                    if ($user instanceof User && (string)$user->getUuid() === (string)$authorUuid) {
                         return $user;
-                    }
+                    };
                 }
-                throw new UserNotFoundException("Cannot find user: $uuid");
-            }
-
-            public function getByUsername(string $username): User
-            {
-                throw new UserNotFoundException("Not found");
+                throw new UserNotFoundException("Cannot find user: $authorUuid");
             }
         };
     }

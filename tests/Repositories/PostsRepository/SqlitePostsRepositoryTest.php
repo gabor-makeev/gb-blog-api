@@ -5,6 +5,7 @@ namespace Gabormakeev\GbBlogApi\UnitTests\Repositories\PostsRepository;
 use Gabormakeev\GbBlogApi\Exceptions\PostNotFoundException;
 use Gabormakeev\GbBlogApi\Post;
 use Gabormakeev\GbBlogApi\Repositories\PostsRepository\SqlitePostsRepository;
+use Gabormakeev\GbBlogApi\UnitTests\DummyLogger;
 use Gabormakeev\GbBlogApi\UUID;
 use PDO;
 use PDOStatement;
@@ -36,7 +37,7 @@ class SqlitePostsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository($connectionStub, new DummyLogger());
 
         $repository->save($post);
     }
@@ -54,7 +55,7 @@ class SqlitePostsRepositoryTest extends TestCase
         ]);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository($connectionStub, new DummyLogger());
 
         $post = $repository->get(new UUID('1e401f4e-aaaa-bbbb-cccc-6753408fb660'));
 
@@ -69,10 +70,11 @@ class SqlitePostsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository($connectionStub, new DummyLogger());
 
         $this->expectException(PostNotFoundException::class);
         $this->expectExceptionMessage('Cannot find post: 1e401f4e-aaaa-bbbb-cccc-6753408fb660');
+        $this->expectOutputString('Cannot find post: 1e401f4e-aaaa-bbbb-cccc-6753408fb660');
 
         $repository->get(new UUID('1e401f4e-aaaa-bbbb-cccc-6753408fb660'));
     }
