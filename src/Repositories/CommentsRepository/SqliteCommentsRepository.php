@@ -7,11 +7,13 @@ use Gabormakeev\GbBlogApi\Exceptions\CommentNotFoundException;
 use Gabormakeev\GbBlogApi\UUID;
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqliteCommentsRepository implements CommentsRepositoryInterface
 {
     public function __construct(
-        private PDO $connection
+        private PDO $connection,
+        private LoggerInterface $logger
     ) {}
 
     public function save(Comment $comment): void
@@ -26,6 +28,8 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
             ':author_uuid' => (string)$comment->getAuthorUuid(),
             ':text' => $comment->getText()
         ]);
+
+        $this->logger->info("Comment saved: {$comment->getUuid()}");
     }
 
     public function get(UUID $uuid): Comment
@@ -46,6 +50,7 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($result === false) {
+            $this->logger->warning("Cannot find comment: $uuid");
             throw new CommentNotFoundException(
                 "Cannot find comment: $uuid"
             );

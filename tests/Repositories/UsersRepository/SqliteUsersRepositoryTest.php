@@ -4,6 +4,7 @@ namespace Gabormakeev\GbBlogApi\UnitTests\Repositories\UsersRepository;
 
 use Gabormakeev\GbBlogApi\Exceptions\UserNotFoundException;
 use Gabormakeev\GbBlogApi\Repositories\UsersRepository\SqliteUsersRepository;
+use Gabormakeev\GbBlogApi\UnitTests\DummyLogger;
 use Gabormakeev\GbBlogApi\User;
 use Gabormakeev\GbBlogApi\UUID;
 use PDO;
@@ -22,10 +23,11 @@ class SqliteUsersRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqliteUsersRepository($connectionStub);
+        $repository = new SqliteUsersRepository($connectionStub, new DummyLogger());
 
         $this->expectException(UserNotFoundException::class);
         $this->expectExceptionMessage('Cannot find user: Ivan');
+        $this->expectOutputString('Cannot find user: Ivan');
 
         $repository->getByUsername('Ivan');
     }
@@ -48,7 +50,7 @@ class SqliteUsersRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqliteUsersRepository($connectionStub);
+        $repository = new SqliteUsersRepository($connectionStub, new DummyLogger());
 
         $repository->save(
             new User(

@@ -7,11 +7,13 @@ use Gabormakeev\GbBlogApi\Post;
 use Gabormakeev\GbBlogApi\UUID;
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqlitePostsRepository implements PostsRepositoryInterface
 {
     public function __construct(
-        private PDO $connection
+        private PDO $connection,
+        private LoggerInterface $logger
     ) {}
 
     public function save(Post $post): void
@@ -26,6 +28,8 @@ class SqlitePostsRepository implements PostsRepositoryInterface
             ':title' => $post->getTitle(),
             ':text' => $post->getText()
         ]);
+
+        $this->logger->info("Post saved: {$post->getUuid()}");
     }
 
     public function get(UUID $uuid): Post
@@ -63,6 +67,7 @@ class SqlitePostsRepository implements PostsRepositoryInterface
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($result === false) {
+            $this->logger->warning("Cannot find post: $uuid");
             throw new PostNotFoundException(
                 "Cannot find post: $uuid"
             );

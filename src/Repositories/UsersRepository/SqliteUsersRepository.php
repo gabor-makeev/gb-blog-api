@@ -7,11 +7,13 @@ use Gabormakeev\GbBlogApi\User;
 use Gabormakeev\GbBlogApi\UUID;
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqliteUsersRepository implements UsersRepositoryInterface
 {
     public function __construct(
-        private PDO $connection
+        private PDO $connection,
+        private LoggerInterface $logger
     ) {}
 
     public function save(User $user): void
@@ -26,6 +28,8 @@ class SqliteUsersRepository implements UsersRepositoryInterface
             ':first_name' => $user->getFirstName(),
             ':last_name' => $user->getLastName()
         ]);
+
+        $this->logger->info("User saved: {$user->getUuid()}");
     }
 
     public function get(UUID $uuid): User
@@ -59,6 +63,7 @@ class SqliteUsersRepository implements UsersRepositoryInterface
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($result === false) {
+            $this->logger->warning("Cannot find user: $username");
             throw new UserNotFoundException(
                 "Cannot find user: $username"
             );

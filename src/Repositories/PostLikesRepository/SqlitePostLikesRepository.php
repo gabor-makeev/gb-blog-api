@@ -5,11 +5,13 @@ namespace Gabormakeev\GbBlogApi\Repositories\PostLikesRepository;
 use Gabormakeev\GbBlogApi\PostLike;
 use Gabormakeev\GbBlogApi\UUID;
 use PDO;
+use Psr\Log\LoggerInterface;
 
 class SqlitePostLikesRepository implements PostLikesRepositoryInterface
 {
     public function __construct(
-        private PDO $connection
+        private PDO $connection,
+        private LoggerInterface $logger
     ) {}
 
     public function save(PostLike $like): void
@@ -23,6 +25,8 @@ class SqlitePostLikesRepository implements PostLikesRepositoryInterface
             ':post_uuid' => (string)$like->getPostUuid(),
             ':user_uuid' => (string)$like->getUserUuid()
         ]);
+
+        $this->logger->info("PostLike saved: {$like->getUuid()}");
     }
 
     public function getByPostUuid(UUID $postUuid): array
@@ -36,6 +40,10 @@ class SqlitePostLikesRepository implements PostLikesRepositoryInterface
         ]);
 
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($result)) {
+            $this->logger->warning("Cannot find PostLikes for post: $postUuid");
+        }
 
         $postLikes = [];
 

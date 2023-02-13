@@ -39,7 +39,7 @@ final class DummyLogger implements LoggerInterface
         Stringable|string $message, array $context = []
     ): void
     {
-        //
+        echo $message;
     }
 
     public function notice(
