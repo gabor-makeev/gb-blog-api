@@ -2,9 +2,10 @@
 
 namespace Gabormakeev\GbBlogApi\Http\Actions\Posts;
 
+use Gabormakeev\GbBlogApi\Exceptions\AuthException;
 use Gabormakeev\GbBlogApi\Exceptions\HttpException;
 use Gabormakeev\GbBlogApi\Http\Actions\ActionInterface;
-use Gabormakeev\GbBlogApi\Http\Auth\IdentificationInterface;
+use Gabormakeev\GbBlogApi\Http\Auth\TokenAuthenticationInterface;
 use Gabormakeev\GbBlogApi\Http\ErrorResponse;
 use Gabormakeev\GbBlogApi\Http\Request;
 use Gabormakeev\GbBlogApi\Http\Response;
@@ -18,13 +19,17 @@ class CreatePost implements ActionInterface
 {
     public function __construct(
         private PostsRepositoryInterface $postsRepository,
-        private IdentificationInterface $identification,
+        private TokenAuthenticationInterface $authentication,
         private LoggerInterface $logger,
     ) {}
 
     public function handle(Request $request): Response
     {
-        $author = $this->identification->user($request);
+        try {
+            $author = $this->authentication->user($request);
+        } catch (AuthException $e) {
+            return new ErrorResponse($e->getMessage());
+        }
 
         $newPostUuid = UUID::random();
 
