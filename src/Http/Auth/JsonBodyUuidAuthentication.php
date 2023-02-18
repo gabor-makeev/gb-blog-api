@@ -11,7 +11,7 @@ use Gabormakeev\GbBlogApi\Repositories\UsersRepository\UsersRepositoryInterface;
 use Gabormakeev\GbBlogApi\User;
 use Gabormakeev\GbBlogApi\UUID;
 
-class JsonBodyUuidIdentification implements IdentificationInterface
+class JsonBodyUuidAuthentication implements AuthenticationInterface
 {
     public function __construct(
         private UsersRepositoryInterface $usersRepository

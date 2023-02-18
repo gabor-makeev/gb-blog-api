@@ -5,7 +5,6 @@ namespace Gabormakeev\GbBlogApi\Commands;
 use Gabormakeev\GbBlogApi\Exceptions\UserNotFoundException;
 use Gabormakeev\GbBlogApi\Repositories\UsersRepository\UsersRepositoryInterface;
 use Gabormakeev\GbBlogApi\User;
-use Gabormakeev\GbBlogApi\UUID;
 use Psr\Log\LoggerInterface;
 
 class CreateUserCommand
@@ -26,16 +25,16 @@ class CreateUserCommand
             return;
         }
 
-        $uuid = UUID::random();
-
-        $this->usersRepository->save(new User(
-            $uuid,
+        $user = User::createFrom(
             $username,
+            $arguments->get('password'),
             $arguments->get('first_name'),
-            $arguments->get('last_name'),
-        ));
+            $arguments->get('last_name')
+        );
 
-        $this->logger->info("User created: $uuid");
+        $this->usersRepository->save($user);
+
+        $this->logger->info("User created: {$user->getUuid()}");
     }
 
     private function userExists(string $username): bool

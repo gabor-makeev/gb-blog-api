@@ -44,6 +44,7 @@ class SqliteUsersRepositoryTest extends TestCase
             ->with([
                 ':uuid' => '123e4567-e89b-12d3-a456-426614174000',
                 ':username' => 'ivan123',
+                ':password' => 'some_password',
                 ':first_name' => 'Ivan',
                 ':last_name' => 'Nikitin',
             ]);
@@ -56,6 +57,7 @@ class SqliteUsersRepositoryTest extends TestCase
             new User(
                 new UUID('123e4567-e89b-12d3-a456-426614174000'),
                 'ivan123',
+                'some_password',
                 'Ivan',
                 'Nikitin'
             )

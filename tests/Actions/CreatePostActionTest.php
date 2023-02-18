@@ -6,7 +6,7 @@ use Gabormakeev\GbBlogApi\Exceptions\HttpException;
 use Gabormakeev\GbBlogApi\Exceptions\InvalidArgumentException;
 use Gabormakeev\GbBlogApi\Exceptions\UserNotFoundException;
 use Gabormakeev\GbBlogApi\Http\Actions\Posts\CreatePost;
-use Gabormakeev\GbBlogApi\Http\Auth\IdentificationInterface;
+use Gabormakeev\GbBlogApi\Http\Auth\AuthenticationInterface;
 use Gabormakeev\GbBlogApi\Http\Request;
 use Gabormakeev\GbBlogApi\Http\SuccessfulResponse;
 use Gabormakeev\GbBlogApi\Repositories\PostsRepository\PostsRepositoryInterface;
@@ -27,6 +27,7 @@ class CreatePostActionTest extends TestCase
             new User(
                 new UUID('1235a110-ee17-4136-91ba-41f720a6d6b4'),
                 'test username',
+                'test password',
                 'test firstname',
                 'test lastname'
             )
@@ -99,9 +100,9 @@ class CreatePostActionTest extends TestCase
         $action->handle($request);
     }
 
-    private function identification(array $users): IdentificationInterface
+    private function identification(array $users): AuthenticationInterface
     {
-        return new class($users) implements IdentificationInterface {
+        return new class($users) implements AuthenticationInterface {
             public function __construct(
                 private array $users
             ) {}

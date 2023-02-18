@@ -2,8 +2,12 @@
 
 use Dotenv\Dotenv;
 use Gabormakeev\GbBlogApi\Container\DIContainer;
-use Gabormakeev\GbBlogApi\Http\Auth\IdentificationInterface;
-use Gabormakeev\GbBlogApi\Http\Auth\JsonBodyUuidIdentification;
+use Gabormakeev\GbBlogApi\Http\Auth\BearerTokenAuthentication;
+use Gabormakeev\GbBlogApi\Http\Auth\PasswordAuthentication;
+use Gabormakeev\GbBlogApi\Http\Auth\PasswordAuthenticationInterface;
+use Gabormakeev\GbBlogApi\Http\Auth\TokenAuthenticationInterface;
+use Gabormakeev\GbBlogApi\Repositories\AuthTokensRepository\AuthTokensRepositoryInterface;
+use Gabormakeev\GbBlogApi\Repositories\AuthTokensRepository\SqliteAuthTokensRepository;
 use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\CommentsRepositoryInterface;
 use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\SqliteCommentsRepository;
 use Gabormakeev\GbBlogApi\Repositories\PostLikesRepository\PostLikesRepositoryInterface;
@@ -74,8 +78,18 @@ $container->bind(
 );
 
 $container->bind(
-    IdentificationInterface::class,
-    JsonBodyUuidIdentification::class
+    PasswordAuthenticationInterface::class,
+    PasswordAuthentication::class
+);
+
+$container->bind(
+    AuthTokensRepositoryInterface::class,
+    SqliteAuthTokensRepository::class
+);
+
+$container->bind(
+    TokenAuthenticationInterface::class,
+    BearerTokenAuthentication::class
 );
 
 return $container;

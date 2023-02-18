@@ -22,6 +22,7 @@ class DummyUsersRepository implements UsersRepositoryInterface
         return new User(
             UUID::random(),
             "user123",
+            'some_password',
             "first",
             "last"
         );

@@ -9,7 +9,7 @@ use Gabormakeev\GbBlogApi\Http\Request;
 use Gabormakeev\GbBlogApi\Repositories\UsersRepository\UsersRepositoryInterface;
 use Gabormakeev\GbBlogApi\User;
 
-class JsonBodyUsernameIdentification implements IdentificationInterface
+class JsonBodyUsernameAuthentication implements AuthenticationInterface
 {
     public function __construct(
         private UsersRepositoryInterface $usersRepository
