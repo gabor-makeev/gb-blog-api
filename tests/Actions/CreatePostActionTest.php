@@ -6,7 +6,7 @@ use Gabormakeev\GbBlogApi\Exceptions\HttpException;
 use Gabormakeev\GbBlogApi\Exceptions\InvalidArgumentException;
 use Gabormakeev\GbBlogApi\Exceptions\UserNotFoundException;
 use Gabormakeev\GbBlogApi\Http\Actions\Posts\CreatePost;
-use Gabormakeev\GbBlogApi\Http\Auth\AuthenticationInterface;
+use Gabormakeev\GbBlogApi\Http\Auth\TokenAuthenticationInterface;
 use Gabormakeev\GbBlogApi\Http\Request;
 use Gabormakeev\GbBlogApi\Http\SuccessfulResponse;
 use Gabormakeev\GbBlogApi\Repositories\PostsRepository\PostsRepositoryInterface;
@@ -23,7 +23,7 @@ class CreatePostActionTest extends TestCase
 
         $postsRepository = $this->createStub(PostsRepositoryInterface::class);
 
-        $identification = $this->identification([
+        $authentication = $this->authentication([
             new User(
                 new UUID('1235a110-ee17-4136-91ba-41f720a6d6b4'),
                 'test username',
@@ -33,7 +33,7 @@ class CreatePostActionTest extends TestCase
             )
         ]);
 
-        $action = new CreatePost($postsRepository, $identification, new DummyLogger());
+        $action = new CreatePost($postsRepository, $authentication, new DummyLogger());
 
         $response = $action->handle($request);
 
@@ -50,9 +50,9 @@ class CreatePostActionTest extends TestCase
 
         $postsRepository = $this->createStub(PostsRepositoryInterface::class);
 
-        $identification = $this->identification([]);
+        $authentication = $this->authentication([]);
 
-        $action = new CreatePost($postsRepository, $identification, new DummyLogger());
+        $action = new CreatePost($postsRepository, $authentication, new DummyLogger());
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Malformed UUID: 1235a110-ee17-4136-91ba-41f720a6d6b');
@@ -70,9 +70,9 @@ class CreatePostActionTest extends TestCase
 
         $postsRepository = $this->createStub(PostsRepositoryInterface::class);
 
-        $identification = $this->identification([]);
+        $authentication = $this->authentication([]);
 
-        $action = new CreatePost($postsRepository, $identification, new DummyLogger());
+        $action = new CreatePost($postsRepository, $authentication, new DummyLogger());
 
         $this->expectException(UserNotFoundException::class);
         $this->expectExceptionMessage('Cannot find user: 1235a110-ee17-4136-91ba-41f720a6d6b4');
@@ -90,9 +90,9 @@ class CreatePostActionTest extends TestCase
 
         $postsRepository = $this->createStub(PostsRepositoryInterface::class);
 
-        $identification = $this->identification([]);
+        $authentication = $this->authentication([]);
 
-        $action = new CreatePost($postsRepository, $identification, new DummyLogger());
+        $action = new CreatePost($postsRepository, $authentication, new DummyLogger());
 
         $this->expectException(HttpException::class);
         $this->expectExceptionMessage('No such field: author_uuid');
@@ -100,9 +100,9 @@ class CreatePostActionTest extends TestCase
         $action->handle($request);
     }
 
-    private function identification(array $users): AuthenticationInterface
+    private function authentication(array $users): TokenAuthenticationInterface
     {
-        return new class($users) implements AuthenticationInterface {
+        return new class($users) implements TokenAuthenticationInterface {
             public function __construct(
                 private array $users
             ) {}
