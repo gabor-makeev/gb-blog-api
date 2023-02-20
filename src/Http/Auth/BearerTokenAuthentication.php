@@ -3,6 +3,7 @@
 namespace Gabormakeev\GbBlogApi\Http\Auth;
 
 use DateTimeImmutable;
+use Gabormakeev\GbBlogApi\AuthToken;
 use Gabormakeev\GbBlogApi\Exceptions\AuthException;
 use Gabormakeev\GbBlogApi\Exceptions\AuthTokenNotFoundException;
 use Gabormakeev\GbBlogApi\Exceptions\HttpException;
@@ -21,6 +22,28 @@ class BearerTokenAuthentication implements TokenAuthenticationInterface
     ) {}
 
     public function user(Request $request): User
+    {
+        $authToken = $this->getAuthToken($request);
+
+        $userUuid = $authToken->getUserUuid();
+
+        return $this->usersRepository->get($userUuid);
+    }
+
+    public function logout(Request $request): void
+    {
+        $authToken = $this->getAuthToken($request);
+
+        $disabledAuthToken = new AuthToken(
+            $authToken->getToken(),
+            $authToken->getUserUuid(),
+            new DateTimeImmutable()
+        );
+
+        $this->authTokensRepository->save($disabledAuthToken);
+    }
+
+    private function getAuthToken(Request $request): AuthToken
     {
         try {
             $header = $request->header('Authorization');
@@ -44,8 +67,6 @@ class BearerTokenAuthentication implements TokenAuthenticationInterface
             throw new AuthException("Token expired: [$token]");
         }
 
-        $userUuid = $authToken->getUserUuid();
-
-        return $this->usersRepository->get($userUuid);
+        return $authToken;
     }
 }
