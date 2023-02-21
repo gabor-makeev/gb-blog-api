@@ -117,6 +117,8 @@ class CreatePostActionTest extends TestCase
                 }
                 throw new UserNotFoundException("Cannot find user: $authorUuid");
             }
+
+            public function logout(Request $request): void {}
         };
     }
 }

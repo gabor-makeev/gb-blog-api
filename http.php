@@ -2,6 +2,7 @@
 
 use Gabormakeev\GbBlogApi\Exceptions\AppException;
 use Gabormakeev\GbBlogApi\Http\Actions\Auth\LogIn;
+use Gabormakeev\GbBlogApi\Http\Actions\Auth\LogOut;
 use Gabormakeev\GbBlogApi\Http\Actions\Comments\CreateComment;
 use Gabormakeev\GbBlogApi\Http\Actions\PostLikes\CreatePostLike;
 use Gabormakeev\GbBlogApi\Http\Actions\Posts\CreatePost;
@@ -50,6 +51,7 @@ $routes = [
     ],
     'POST' => [
         '/login' => LogIn::class,
+        '/logout' => LogOut::class,
         '/posts/create' => CreatePost::class,
         '/posts/comment' => CreateComment::class,
         '/postLikes/create' => CreatePostLike::class
