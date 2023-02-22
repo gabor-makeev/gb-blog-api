@@ -3,9 +3,11 @@
 namespace Gabormakeev\GbBlogApi\Repositories\PostsRepository;
 
 use Gabormakeev\GbBlogApi\Exceptions\PostNotFoundException;
+use Gabormakeev\GbBlogApi\Exceptions\PostsRepositoryException;
 use Gabormakeev\GbBlogApi\Post;
 use Gabormakeev\GbBlogApi\UUID;
 use PDO;
+use PDOException;
 use PDOStatement;
 use Psr\Log\LoggerInterface;
 
@@ -47,19 +49,18 @@ class SqlitePostsRepository implements PostsRepositoryInterface
 
     public function delete(UUID $uuid): void
     {
-        if (!$this->get($uuid)) {
-            throw new PostNotFoundException(
-                "Cannot find post: $uuid"
+        try {
+            $statement = $this->connection->prepare(
+                'DELETE FROM posts WHERE uuid = :uuid'
+            );
+            $statement->execute([
+                ':uuid' => (string)$uuid
+            ]);
+        } catch (PDOException $e) {
+            throw new PostsRepositoryException(
+                $e->getMessage(), (int)$e->getCode(), $e
             );
         }
-
-        $statement = $this->connection->prepare(
-            'DELETE FROM posts WHERE uuid = :uuid'
-        );
-
-        $statement->execute([
-            ':uuid' => (string)$uuid
-        ]);
     }
 
     private function getPost(PDOStatement $statement, UUID $uuid): Post
