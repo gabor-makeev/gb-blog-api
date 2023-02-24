@@ -1,6 +1,10 @@
 <?php
 
 use Dotenv\Dotenv;
+use Faker\Provider\Lorem;
+use Faker\Provider\ru_RU\Internet;
+use Faker\Provider\ru_RU\Person;
+use Faker\Provider\ru_RU\Text;
 use Gabormakeev\GbBlogApi\Container\DIContainer;
 use Gabormakeev\GbBlogApi\Http\Auth\BearerTokenAuthentication;
 use Gabormakeev\GbBlogApi\Http\Auth\PasswordAuthentication;
@@ -90,6 +94,18 @@ $container->bind(
 $container->bind(
     TokenAuthenticationInterface::class,
     BearerTokenAuthentication::class
+);
+
+$faker = new \Faker\Generator();
+
+$faker->addProvider(new Person($faker));
+$faker->addProvider(new Text($faker));
+$faker->addProvider(new Internet($faker));
+$faker->addProvider(new Lorem($faker));
+
+$container->bind(
+    \Faker\Generator::class,
+    $faker
 );
 
 return $container;
