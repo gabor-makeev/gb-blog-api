@@ -2,13 +2,16 @@
 
 namespace Gabormakeev\GbBlogApi\Commands\FakeData;
 
+use Gabormakeev\GbBlogApi\Comment;
 use Gabormakeev\GbBlogApi\Post;
+use Gabormakeev\GbBlogApi\Repositories\CommentsRepository\CommentsRepositoryInterface;
 use Gabormakeev\GbBlogApi\Repositories\PostsRepository\PostsRepositoryInterface;
 use Gabormakeev\GbBlogApi\Repositories\UsersRepository\UsersRepositoryInterface;
 use Gabormakeev\GbBlogApi\User;
 use Gabormakeev\GbBlogApi\UUID;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PopulateDB extends Command
@@ -17,6 +20,7 @@ class PopulateDB extends Command
         private \Faker\Generator $faker,
         private UsersRepositoryInterface $usersRepository,
         private PostsRepositoryInterface $postsRepository,
+        private CommentsRepositoryInterface $commentsRepository,
     ) {
         parent::__construct();
     }
@@ -25,7 +29,22 @@ class PopulateDB extends Command
     {
         $this
             ->setName('fake-data:populate-db')
-            ->setDescription('Populates DB with fake data');
+            ->setDescription('Populates DB with fake data')
+            ->addOption(
+                'users-number',
+                'u',
+                InputOption::VALUE_OPTIONAL,
+                'Define the number of users to be generated',
+                10
+            )
+            ->addOption(
+                'posts-number',
+                'p',
+                InputOption::VALUE_OPTIONAL,
+                'Define the number of posts to be generated per user',
+                20
+
+            );
     }
 
     protected function execute(
@@ -34,16 +53,31 @@ class PopulateDB extends Command
     ): int {
         $users = [];
 
-        for ($i = 0; $i < 10; $i++) {
+        $usersNumber = (int)$input->getOption('users-number');
+        $postsNumber = (int)$input->getOption('posts-number');
+        $commentsNumber = 3;
+
+        if (!$usersNumber || !$postsNumber) {
+            $output->writeln('Optional users-number (u) and posts-number (p) options must be positive integers');
+            return Command::FAILURE;
+        }
+
+        for ($i = 0; $i < $usersNumber; $i++) {
             $user = $this->createFakeUser();
             $users[] = $user;
             $output->writeln('User created: ' . $user->getUsername());
         }
 
         foreach ($users as $user) {
-            for ($i = 0; $i < 20; $i++) {
+            for ($i = 0; $i < $postsNumber; $i++) {
                 $post = $this->createFakePost($user);
                 $output->writeln('Post created: ' . $post->getTitle());
+
+                for ($j = 0; $j < $commentsNumber; $j++) {
+                    $randomUser = $users[array_rand($users)];
+                    $comment = $this->createFakeComment($post, $randomUser);
+                    $output->writeln('Comment created: ' . $comment->getUuid());
+                }
             }
         }
 
@@ -76,5 +110,19 @@ class PopulateDB extends Command
         $this->postsRepository->save($post);
 
         return $post;
+    }
+
+    private function createFakeComment(Post $post, User $author): Comment
+    {
+        $comment = new Comment(
+            UUID::random(),
+            $author->getUuid(),
+            $post->getUuid(),
+            $this->faker->sentence(10, true)
+        );
+
+        $this->commentsRepository->save($comment);
+
+        return $comment;
     }
 }
